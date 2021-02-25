@@ -21,11 +21,21 @@ Need to only show a message to folks visiting from Canada 🇨🇦? No problems,
 
 How about showing a banner to your British 🇬🇧 visitors? You got it, guvnor. (I'm a Brit living in Canada ;) )
 
+Note: This uses cookies to help reduce API calls. If that is something you need to tell your users about, please make sure to do just that :)
+
 ## Development
 
 Development is mostly done on [github](https://github.com/richardtape/content-visibility-geolocation/issues/new) and releases are made there and here to the WordPress plugins directory.
 
 == Frequently Asked Questions ==
+
+= What if someone uses a VPN? =
+
+People can be sneaky. This plugin uses a 3rd party IP-lookup API (which you can self-host should you desire) which gets location data based on the IP Address passed to it. If a user is using a VPN to mask where they are coming from, it is quite likely that the user will see content restricted to the country of their VPN connection.
+
+= Does this store cookies in a user's browser? =
+
+Yes. It does this in order to stop hitting an API for every page load. A cookie is stored for 1 week with information about where the person is visiting from.
 
 = What's with the logo? =
 

@@ -1,4 +1,4 @@
 import './editor.scss';
 import './style.scss';
 
-import ContentVisibilityUserRoleControl from './controls/content-visibility-user-role';
+import ContentVisibilityGeolocationControl from './controls/content-visibility-geolocation';

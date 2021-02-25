@@ -1,7 +1,7 @@
 === Content Visibility Geolocation ===
 Contributors: iamfriendly
 Donate link: https://girlswhocode.com/
-Tags: block, content, visibility, user, location, geolocation, contentvisibility
+Tags: block, content, visibility, geolocation, location, contentvisibility
 Requires at least: 5.0
 Tested up to: 5.6.2
 Stable tag: 0.1.0
@@ -13,7 +13,13 @@ A geolocation add-on for [Content Visibility](https://wordpress.org/plugins/cont
 
 == Description ==
 
+Content Visibility Geolocation is an add-on for [Content Visibility](https://wordpress.org/plugins/content-visibility/) - a plugin which allows you to decide when, where, and to whom each piece of your content is shown (or hidden!).
 
+The geolocation add-on allows you to show or hide any of your content blocks to users visiting your site from any country of your choosing.
+
+Need to only show a message to folks visiting from Canada 🇨🇦? No problems, eh.
+
+How about showing a banner to your British 🇬🇧 visitors? You got it, guvnor. (I'm a Brit living in Canada ;) )
 
 ## Development
 
@@ -27,7 +33,7 @@ It's a chameleon. A cool little creature which can change the way it appears - t
 
 = Got a question? =
 
-Let me know: [https://github.com/richardtape/content-visibility-user-role/issues/new](https://github.com/richardtape/content-visibility-user-role/issues/new)
+Let me know: [https://github.com/richardtape/content-visibility-geolocation/issues/new](https://github.com/richardtape/content-visibility-geolocation/issues/new)
 
 == Screenshots ==
 1. Showing the content visibility geolocation controls in the content editor sidebar

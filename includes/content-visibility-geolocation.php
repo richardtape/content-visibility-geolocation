@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Main loader file for Content Visibility Geolocation Add-on.
  *
@@ -50,9 +49,16 @@ function enqueue_editor_assets() { // phpcs:ignore
 
 	wp_enqueue_script( 'content-visibility-geolocation' );
 
-	wp_enqueue_style( 'content-visibility-geolocation-panel', plugins_url( 'build/index.css', dirname( __FILE__ ) ) );
+	wp_enqueue_style(
+		'content-visibility-geolocation-panel',
+		plugins_url( 'build/index.css', dirname( __FILE__ ) ),
+		array(),
+		filemtime( plugin_dir_path( __DIR__ ) . 'build/index.css' ),
+		'all'
+	);
 
 }//end enqueue_editor_assets()
+
 
 add_filter( 'content_visibility_rule_types_and_callbacks', __NAMESPACE__ . '\\add_rule_type_and_callback' );
 
@@ -69,6 +75,7 @@ function add_rule_type_and_callback( $default_rule_types_and_callbacks ) {
 	return $default_rule_types_and_callbacks;
 
 }//end add_rule_type_and_callback()
+
 
 /**
  * Logic to determine whether to show or hide a block based on the current user's country, and the settings for this block.
@@ -107,7 +114,12 @@ function rule_logic_geolocation( $rule_value, $block_visibility, $block ) {
 
 	$users_country_is_in_block_list = false;
 
-	if ( in_array( $users_country, array_values( $countries_for_block ) ) ) {
+	// Ensure the country code is encoded, can be an issue on first load without a cookie.
+	if ( strlen( $users_country ) <= 4 ) {
+		$users_country = encode_country_code( $users_country );
+	}
+
+	if ( in_array( $users_country, array_values( $countries_for_block ) ) ) { // phpcs:ignore
 		$users_country_is_in_block_list = true;
 	}
 
@@ -137,13 +149,8 @@ function init__set_cookies() {
 		return;
 	}
 
-	// Ensure we have access to the cookie library.
-	if ( ! class_exists( '\Delight\Cookie\Cookie' ) ) {
-		require_once plugin_dir_path( __FILE__ ) . 'external/cookie.php';
-	}
-
 	// Test to see if we have a cookie already saved which contains the user's country code.
-	if ( \Delight\Cookie\Cookie::exists( 'content_visibility_country_code' ) ) {
+	if ( cv_cookie_exists( 'content_visibility_country_code' ) ) {
 		return;
 	}
 
@@ -158,7 +165,7 @@ function init__set_cookies() {
 		return;
 	}
 
-	\Delight\Cookie\Cookie::setcookie(
+	cv_set_cookie(
 		'content_visibility_country_code',
 		$users_country_from_api,
 		time() + WEEK_IN_SECONDS,
@@ -188,8 +195,8 @@ function get_users_country() {
 	}
 
 	// Test to see if we have a cookie already saved which contains the user's country code.
-	if ( \Delight\Cookie\Cookie::exists( 'content_visibility_country_code' ) ) {
-		return \Delight\Cookie\Cookie::get( 'content_visibility_country_code' );
+	if ( cv_cookie_exists( 'content_visibility_country_code' ) ) {
+		return cv_get_cookie( 'content_visibility_country_code' );
 	}
 
 	// There's no cookie, so we'll need to hit the API here.
@@ -336,9 +343,10 @@ function get_users_country_from_api() {
 
 	$users_country = sanitize_text_field( $api_response['alpha2'] );
 
-	return sanitize_text_field( $api_response['alpha2'] );
+	return $users_country;
 
 }//end get_users_country_from_api()
+
 
 /**
  * Get the IP Address of the current user.
@@ -401,3 +409,87 @@ function get_ip_address() {
 
 }//end get_ip_address()
 
+
+/*
+ * Begin abstraction layer for external Cookie library to ensure WordPress data is sanitized, validated
+ * and escaped. This enables us to keep the third-party cookie library untouched, yet pass around data
+ * safely.
+ *
+ * Thank you to the plugins repo review team for catching this which helps me keep user's site's
+ * secure.
+ */
+
+/**
+ * Test if a cookie with the passed cookie key exists.
+ *
+ * Wrapper function for the Delight Cookie library, allowing us to keep that external package untouched
+ * and provide an extra level of sanitization and validation for our WordPress side of things.
+ *
+ * @param string $cookie_key The key used for the name of the cookie.
+ * @return bool  false if the cookie is not set. True otherwise.
+ */
+function cv_cookie_exists( $cookie_key ) {
+
+	// Ensure we have access to the cookie library.
+	if ( ! class_exists( '\Delight\Cookie\Cookie' ) ) {
+		require_once plugin_dir_path( __FILE__ ) . 'external/cookie.php';
+	}
+
+	return (bool) \Delight\Cookie\Cookie::exists( sanitize_text_field( $cookie_key ) );
+
+}//end cv_cookie_exists()
+
+
+/**
+ * Fetch the passed cookie key value.
+ *
+ * Wrapper function for the Delight Cookie library, allowing us to keep that external package untouched
+ * and provide an extra level of sanitization and validation for our WordPress side of things.
+ *
+ * @param string $cookie_key The key used for the name of the cookie.
+ * @return mixed the value from the requested cookie or the default value
+ */
+function cv_get_cookie( $cookie_key ) {
+
+	// Ensure we have access to the cookie library.
+	if ( ! class_exists( '\Delight\Cookie\Cookie' ) ) {
+		require_once plugin_dir_path( __FILE__ ) . 'external/cookie.php';
+	}
+
+	return esc_html( \Delight\Cookie\Cookie::get( sanitize_text_field( $cookie_key ) ) );
+
+}//end cv_get_cookie()
+
+/**
+ * Wrapper function for the Delight Cookie library, allowing us to keep that external package untouched
+ * and provide an extra level of sanitization and validation for our WordPress side of things.
+ *
+ * @param string      $name the name of the cookie which is also the key for future accesses via `$_COOKIE[...]`.
+ * @param mixed|null  $value the value of the cookie that will be stored on the client's machine.
+ * @param int         $expiration the Unix timestamp indicating the time that the cookie will expire at, i.e. usually `time() + $seconds`.
+ * @param string|null $path the path on the server that the cookie will be valid for (including all sub-directories), e.g. an empty string for the current directory or `/` for the root directory.
+ * @param string|null $domain the domain that the cookie will be valid for (including subdomains) or `null` for the current host (excluding subdomains).
+ * @param bool        $secure indicates that the cookie should be sent back by the client over secure HTTPS connections only.
+ * @param bool        $http indicates that the cookie should be accessible through the HTTP protocol only and not through scripting languages.
+ * @param string|null $same_site indicates that the cookie should not be sent along with cross-site requests (either `null`, `None`, `Lax` or `Strict`).
+ * @return bool whether the cookie header has successfully been sent (and will *probably* cause the client to set the cookie)
+ */
+function cv_set_cookie( $name, $value, $expiration, $path, $domain, $secure, $http, $same_site ) {
+
+	// Ensure we have access to the cookie library.
+	if ( ! class_exists( '\Delight\Cookie\Cookie' ) ) {
+		require_once plugin_dir_path( __FILE__ ) . 'external/cookie.php';
+	}
+
+	return (bool) \Delight\Cookie\Cookie::setcookie(
+		sanitize_text_field( $name ),
+		sanitize_text_field( $value ),
+		absint( $expiration ),
+		COOKIEPATH, // Force COOKIEPATH as that is trusted.
+		COOKIE_DOMAIN, // Force COOKIEDOMAIN as that is trusted.
+		filter_var( $secure, FILTER_VALIDATE_BOOLEAN ),  // Secure cookie.
+		filter_var( $http, FILTER_VALIDATE_BOOLEAN ), // Not HTTP only.
+		sanitize_text_field( $same_site )  // Better for multisite.
+	);
+
+}//end cv_set_cookie()

@@ -10,7 +10,7 @@ How about showing a banner to your British 🇬🇧 visitors? You got it, guvnor
 
 ## Content Visibility
 
-Works alongside the core [Content Visibility plugin](https://github.com/richardtape/content-visibility) and [Date and Time add-on](https://github.com/richardtape/content-visibility-date-and-time) meaning you can schedule blocks for dates and times and only shown them to those users signed in with a specific role from a specific country!
+Works alongside the core [Content Visibility plugin](https://wordpress.org/plugins/content-visibility) and [Date and Time add-on](https://wordpress.org/plugins/content-visibility-date-and-time) meaning you can schedule blocks for dates and times and only shown them to those users signed in with a specific role from a specific country!
 
 ## Who made this?
 

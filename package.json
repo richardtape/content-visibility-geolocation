@@ -1,6 +1,6 @@
 {
   "name": "content-visibility-geolocation",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Decide which user's locations can see your blocks.",
   "main": "build/index.js",
   "scripts": {

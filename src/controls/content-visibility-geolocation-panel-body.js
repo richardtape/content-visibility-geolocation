@@ -3,7 +3,7 @@ import { withInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 import { ContentVisibilityGeolocationMultiSelect } from '../controls/content-visibility-geolocation-multisitelect';
-
+import hasRules from '../helpers/has-rules';
 /**
  * PHP sends through a list of all the users on the site. We massage that data to be
  * usable by our Dropdown.
@@ -40,11 +40,13 @@ function ContentVisibilityGeolocationBodyControl( { instanceId, props } ) {
     const data = getCountries();
     const type = 'geolocation';
 
+    let hasRulesClass = ( hasRules( props, type ) ) ? ' has-active-rules' : '';
+
     return (
         <PanelBody
             title={ __( 'Geolocation', 'content-visibility-geolocation' ) }
             initialOpen={ false }
-            className="content-visibility-control-panel content-visibility-geolocation-controls"
+            className={"content-visibility-control-panel content-visibility-geolocation-controls" + hasRulesClass}
         >
             <PanelRow>
                 <ContentVisibilityGeolocationMultiSelect data={ data } labelledBy="Select Specific Users" props={ props } type={ type } />

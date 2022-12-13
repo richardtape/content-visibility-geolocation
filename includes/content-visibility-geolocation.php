@@ -22,17 +22,26 @@ add_action( 'content_visibility_enqueue_editor_assets', __NAMESPACE__ . '\\enque
  */
 function enqueue_editor_assets() { // phpcs:ignore
 
+	$prereqs = array(
+		'wp-blocks',
+		'wp-i18n',
+		'wp-element',
+		'wp-plugins',
+		'wp-dom-ready',
+	);
+
+	// The 5.8 widgets screen requires a special editor?! Feelsbadman.
+	$CVEditor = new \RichardTape\ContentVisibility\Editor();
+	if ( $CVEditor->on_widgets_screen() ) {
+		$prereqs[] = 'wp-edit-widgets';
+	} else {
+		$prereqs[] = 'wp-editor';
+	}
+
 	wp_register_script(
 		'content-visibility-geolocation',
 		plugins_url( '/build/index.js', dirname( __FILE__ ) ),
-		array(
-			'wp-blocks',
-			'wp-i18n',
-			'wp-element',
-			'wp-editor',
-			'wp-plugins',
-			'wp-edit-post',
-		),
+		$prereqs,
 		filemtime( plugin_dir_path( __DIR__ ) . 'build/index.js' ),
 		true
 	);

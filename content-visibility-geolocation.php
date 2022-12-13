@@ -11,7 +11,7 @@
  * Plugin Name: Content Visibility Geolocation
  * Plugin URI:  https://richardtape.com/content-visibility/
  * Description: [Content Visibility Add-On] Show or hide your blocks to visitors from specific countries.
- * Version:     0.1.1
+ * Version:     0.1.2
  * Author:      Richard Tape
  * Author URI:  https://richardtape.com
  * Text Domain: content-visibility-geolocation

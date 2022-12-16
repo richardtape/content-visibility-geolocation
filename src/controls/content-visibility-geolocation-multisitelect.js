@@ -1,4 +1,4 @@
-import MultiSelect from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import { withState } from '@wordpress/compose';
 
 export const ContentVisibilityGeolocationMultiSelect = withState( {
@@ -28,11 +28,13 @@ export const ContentVisibilityGeolocationMultiSelect = withState( {
 
     };
 
+    let assumedValue = ( props.attributes.contentVisibilityRules.geolocation && props.attributes.contentVisibilityRules.geolocation[type] ) ? props.attributes.contentVisibilityRules.geolocation[type] : option;
+
     return (
         <div className="content-visibility-multi-select">
             <MultiSelect
                 options={ data }
-                value={ props.attributes.contentVisibilityRules.geolocation[type] || option }
+                value={ assumedValue }
                 onChange={ onChange }
                 labelledBy={ labelledBy }
                 ItemRenderer={ ( { checked, option, onClick, disabled, } ) => {
